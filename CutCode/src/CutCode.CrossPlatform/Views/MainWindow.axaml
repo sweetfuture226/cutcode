@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CutCode.CrossPlatform.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:rxui="clr-namespace:Avalonia.ReactiveUI;assembly=Avalonia.ReactiveUI"
+        xmlns:views="using:CutCode.CrossPlatform.Views"
+        xmlns:controls="using:CutCode.CrossPlatform.Controls"
+        xmlns:conv="using:CutCode.CrossPlatform.Converters"
+        xmlns:defconverters="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml"
+        xmlns:converters="using:CutCode.CrossPlatform.Converters"
+        xmlns:help="clr-namespace:CutCode.CrossPlatform.Helpers"
+        mc:Ignorable="d"
+        MinHeight="500" MinWidth="750"
+        d:DesignHeight="570" d:DesignWidth="800"
+        x:Class="CutCode.CrossPlatform.Views.MainWindow"
+        Icon="/Assets/Images/logo.ico"
+        Title="CutCode"
+        BorderThickness="0"
+        BorderBrush="Transparent"
+        TransparencyLevelHint="Transparent"
+        WindowState="Maximized"
+        CornerRadius="50"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+
+    <Window.Background>
+        <SolidColorBrush Color="{Binding BackgroundColor}" />
+    </Window.Background>
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Window.Styles>
+        <StyleInclude Source="avares://CutCode.CrossPlatform/Controls/WindowButtons.axaml" />
+        <Style Selector=":is(Button).ButtonStyle">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border>
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.ButtonStyle /template/ Border:pointerover">
+            <Setter Property="Background" Value="{Binding $parent[Button].BorderBrush}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+    </Window.Styles>
+
+
+    <Window.Resources>
+        <defconverters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <converters:StringToGeometryConverter x:Key="StringToGeometryConverter" />
+    </Window.Resources>
+
+
+    <Grid RowDefinitions="50,*" ColumnDefinitions="60,*,auto, Auto" Margin="{Binding $parent[Window].OffScreenMargin}"
+          Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrushConverter}}">
+        <Border Grid.Column="0" Grid.Row="0"
+                Background="{Binding SideBarColor, Converter={StaticResource ColorToBrushConverter}}">
+            <Image Source="avares://CutCode.CrossPlatform/Assets/Images/logo.png"
+                   Width="35" Height="35" Margin="5,0,0,0"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+        </Border>
+        <Grid Grid.Column="1" Grid.Row="0"
+              Background="{Binding TitleBarColor, Converter={StaticResource ColorToBrushConverter}}"
+              ColumnDefinitions="*,auto"
+              PointerPressed="ChangeWindowPosition">
+            <Label Grid.Column="0" Content="CutCode" FontSize="20"
+                   Foreground="{Binding MainTextColor, Converter={StaticResource ColorToBrushConverter}}"
+                   FontWeight="Bold" FontFamily="{DynamicResource PoppinsSemibold}"
+                   Padding="15,10,15,0">
+            </Label>
+            <ToggleSwitch Grid.Column="1"
+                          Margin="0 0 10 0"
+                          OffContent="Light" OnContent="Dark"
+                          Foreground="{Binding MainTextColor, Converter={StaticResource ColorToBrushConverter}}"
+                          IsChecked="{Binding IsDarkTheme}">
+            </ToggleSwitch>
+        </Grid>
+        <controls:WindowButtons Grid.Column="2" Grid.Row="0"
+                                HostWindow="{Binding $parent[Window]}"
+                                Background="{Binding TitleBarColor, Converter={StaticResource ColorToBrushConverter}}"
+                                Foreground="{Binding MainTextColor, Converter={StaticResource ColorToBrushConverter}}">
+        </controls:WindowButtons>
+        <SplitView IsPaneOpen="True" DisplayMode="Inline" OpenPaneLength="60" Grid.Column="0" Grid.Row="1"
+                   Grid.ColumnSpan="3">
+
+            <SplitView.Styles>
+                <Style Selector="Panel">
+                    <Setter Property="Background"
+                            Value="{Binding SideBarColor, Converter={StaticResource ColorToBrushConverter}}">
+                    </Setter>
+                </Style>
+                <Style Selector="Button">
+                    <Setter Property="Background" Value="Transparent"></Setter>
+                    <Setter Property="Margin" Value="4"></Setter>
+                </Style>
+            </SplitView.Styles>
+            <SplitView.Pane>
+                <StackPanel x:Name="MenuPanel"
+                            Background="{Binding SideBarColor, Converter={StaticResource ColorToBrushConverter}}">
+                    <controls:NavigationItem
+                        x:Name="HomeViewModel"
+                        ToolTip.Tip="Home"
+                        ToolTip.Placement="Right"
+                        ToolTip.ShowDelay="0"
+                        ToolTip.HorizontalOffset="8"
+                        IconColour="{Binding MenuButtonColour, Converter={StaticResource ColorToBrushConverter}}"
+                        Icon="{x:Static help:IconPaths.Home}"
+                        Command="{Binding GoHome}"
+                        IsActive="True" />
+                    <controls:NavigationItem
+                        x:Name="AddViewModel"
+                        ToolTip.Tip="Add a snippet"
+                        ToolTip.Placement="Right"
+                        ToolTip.ShowDelay="0"
+                        ToolTip.HorizontalOffset="8"
+                        IconColour="{Binding MenuButtonColour, Converter={StaticResource ColorToBrushConverter}}"
+                        Icon="{x:Static help:IconPaths.Add}"
+                        Command="{Binding GoAdd}" />
+                    <controls:NavigationItem
+                        x:Name="FavoritesViewModel"
+                        ToolTip.Tip="My favourite snippets"
+                        ToolTip.Placement="Right"
+                        ToolTip.ShowDelay="0"
+                        ToolTip.HorizontalOffset="8"
+                        IconColour="{Binding MenuButtonColour, Converter={StaticResource ColorToBrushConverter}}"
+                        Icon="{x:Static help:IconPaths.Favourite}"
+                        Command="{Binding GoFavourites}" />
+                    <controls:NavigationItem
+                        x:Name="SettingsViewModel"
+                        ToolTip.Tip="Settings"
+                        ToolTip.Placement="Right"
+                        ToolTip.ShowDelay="0"
+                        ToolTip.HorizontalOffset="8"
+                        IconColour="{Binding MenuButtonColour, Converter={StaticResource ColorToBrushConverter}}"
+                        Icon="{x:Static help:IconPaths.Setting}"
+                        Command="{Binding GoSettings}" />
+                    
+                    <StackPanel.Styles>
+                        <Style Selector="controls|NavigationItem ToolTip">
+                            <Setter Property="Padding" Value="10 7 10 7"/>
+                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="FontFamily" Value="{DynamicResource PoppinsRegular}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource TextColor1}"/>
+                            <Setter Property="Background" Value="{DynamicResource BackgroundColor1}"/>
+                            <Setter Property="Template">
+                                <ControlTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox VerticalAlignment="Center" Height="12">
+                                            <Path Stretch="UniformToFill" Fill="{TemplateBinding Background}" 
+                                                  Data="F1M130.5,-175L137.5,-169.837493896484 137.5,-29.9124984741211 130.75,-25.0000019073486 62.5,-95.3375015258789 62.5,-105.675003051758 130.5,-175z"/>
+                                        </Viewbox>
+                                        <ContentPresenter Name="PART_ContentPresenter"
+                                                          Background="{TemplateBinding Background}"
+                                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          Content="{TemplateBinding Content}" 
+                                                          Padding="{TemplateBinding Padding}"/>
+                                    </StackPanel>
+                                </ControlTemplate>
+                            </Setter>
+                        </Style>
+                    </StackPanel.Styles>
+                </StackPanel>
+            </SplitView.Pane>
+            <rxui:RoutedViewHost Router="{Binding Router}">
+                <rxui:RoutedViewHost.PageTransition>
+                    <CrossFade Duration="0:00:00.250"/>
+                </rxui:RoutedViewHost.PageTransition>
+            </rxui:RoutedViewHost>
+        </SplitView>
+
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+            <ItemsControl Margin="0,0,10,10"
+                          Items="{Binding Notifications}"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ContentPresenter Margin="0,5,0,5" Content="{Binding View}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</Window>
